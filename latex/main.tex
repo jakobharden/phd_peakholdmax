@@ -1,0 +1,264 @@
+% !BIB TS-program = biblatex
+% !TeX spellcheck = en_US
+%
+%#######################################################################################################################
+% LICENSE
+%
+% "main.tex" (C) 2025 by Jakob Harden (Graz University of Technology) is licensed under a Creative Commons Attribution 4.0 International license.
+%
+% License deed: https://creativecommons.org/licenses/by/4.0/
+% Author email: jakob.harden@tugraz.at, jakob.harden@student.tugraz.at, office@jakobharden.at
+% Author website: https://jakobharden.at/wordpress/
+% Author ORCID: https://orcid.org/0000-0002-5752-1785
+%
+% This file is part of the PhD thesis of Jakob Harden.
+%#######################################################################################################################
+%
+% Beamer documentation: https://www.beamer.plus/Structuring-Presentation-The-Local-Structure.html
+%
+% preamble
+\documentclass[11pt,aspectratio=169]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[LGR,T1]{fontenc}
+\usepackage[ngerman,english]{babel}
+\usepackage{hyphenat}
+\usepackage{lmodern}
+\usepackage{blindtext}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{calc,fpu,plotmarks}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepgflibrary{fpu}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{hyperref}
+\usepackage[backend=biber,style=numeric]{biblatex}
+\addbibresource{biblio.bib}
+
+%
+% text blocks
+\def\PresTitle{Local maxima detection for sinusoidal signals corrupted by noise}
+\def\PresSubTitle{A numerical study on (damped) sinusoidal signals}
+\def\PresDate{25${}^{\text{st}}$ of May, 2025}
+\def\PresFootInfo{My PhD thesis, research in progress ...}
+\def\PresAuthorFirstname{Jakob}
+\def\PresAuthorLastname{Harden}
+\def\PresAuthor{\PresAuthorFirstname{} \PresAuthorLastname{}}
+\def\PresAuthorAffiliation{Graz University of Technology}
+\def\PresAuthorAffiliationLocation{\PresAuthorAffiliation{} (Graz, Austria)}
+\def\PresAuhtorWebsite{jakobharden.at}
+\def\PresAuhtorWebsiteURL{https://jakobharden.at/wordpress/}
+\def\PresAuhtorEmailFirst{jakob.harden@tugraz.at}
+\def\PresAuhtorEmailSecond{jakob.harden@student.tugraz.at}
+\def\PresAuhtorEmailThird{office@jakobharden.at}
+\def\PresAuthorOrcid{0000-0002-5752-1785}
+\def\PresAuthorOrcidURL{https://orcid.org/0000-0002-5752-1785}
+\def\PresAuthorLinkedin{jakobharden}
+\def\PresAuthorLinkedinURL{https://www.linkedin.com/in/jakobharden/}
+\def\PresCopyrightType{ccby} % one of: copyright, ccby, ccysa
+%
+% Beamer theme adaptations
+%   type:        Presentation
+%   series:      Research in progress (RIP)
+%   description: This theme is designed to present preliminary research results.
+\input{adaptthemePresRIP}
+%
+% Load Octave to TeX tool
+\input{oct2texdefs}
+%
+% graphics path
+\graphicspath{{../octave/results/test_peakholdmax}}
+%
+% computation result path
+\newcommand{\RPATH}{../octave/results/test_peakholdmax}
+%
+%#######################################################################################################################
+\begin{document}
+	% set title page items
+	\author{\PresAuthor{} (\PresAuthorAffiliation{})}
+	\title{\PresTitle{}}
+	\subtitle{\PresSubTitle{}}
+	%\logo{}
+	%\institute{}
+	\date{\PresDate{}}
+	%\subject{}
+	%\setbeamercovered{transparent}
+	%\setbeamertemplate{navigation symbols}{}
+	%
+	%-------------------------------------------------------------------------------------------------------------------
+	\begin{frame}[plain]
+		\maketitle
+	\end{frame}
+	%
+	%-------------------------------------------------------------------------------------------------------------------
+	\section*{Abstract}
+	\begin{frame}
+		\frametitle{Abstract}
+		% german text
+		\begin{abstract}
+			%TODO: write abstract
+		\end{abstract}
+	\end{frame}
+	%
+	%-------------------------------------------------------------------------------------------------------------------
+	\section{Introduction}
+	\begin{frame}
+		\frametitle{Introduction}
+		\begin{itemize}
+			\item \textcolor{RIPtitlecol}{WHAT}
+			\begin{itemize}
+				\item xxx
+				\item xxx
+			\end{itemize}
+			\item \textcolor{RIPtitlecol}{WHY}
+			\begin{itemize}
+				\item xxx
+				\item xxx
+			\end{itemize}
+			\item \textcolor{RIPtitlecol}{HOW}
+			\begin{itemize}
+				\item xxx
+				\item xxx
+			\end{itemize}
+			\item \textcolor{RIPtitlecol}{USAGE}
+				\begin{itemize}
+					\item xxx
+					\item xxx
+				\end{itemize}
+			\item \textcolor{RIPtitlecol}{HIGHLIGHT} \textbf{xxx}
+		\end{itemize}
+	\end{frame}
+	%
+	%-------------------------------------------------------------------------------------------------------------------
+	\section{Materials \& Methods}
+	\begin{frame}
+		\frametitle{Materials \& Methods I}
+		\begin{columns}
+			\begin{RIPcolleft}
+				\begin{itemize}
+					\setlength\itemsep{0.5em}
+					\item \textcolor{RIPtitlecol}{Materials}
+					\begin{itemize}
+						\setlength\itemsep{0.5em}
+						\item xxx
+					\end{itemize}
+				\end{itemize}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{xxx}\\
+				\vspace{1em}
+				%\includegraphics[width=40mm,trim={15mm 10mm 20mm 20mm}, clip]{xxx}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Materials \& Methods II}
+		\begin{itemize}
+			\setlength\itemsep{0.5em}
+			\item \textcolor{RIPtitlecol}{Methods}
+			\begin{itemize}
+				\setlength\itemsep{0.5em}
+				\item xxx
+			\end{itemize}
+		\end{itemize}
+		\vspace*{.5em}
+		\small \textbf{Note:} xxx.
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Materials \& Methods III}
+		To study the algorithm, a parameter variation was carried out using the following parameters.
+		\begin{itemize}
+			\setlength\itemsep{0.5em}
+			\item \textcolor{RIPtitlecol}{Numerical study - parameter variation}
+			\begin{itemize}
+				\setlength\itemsep{0.5em}
+				\item Constant: $A = 1 \quad [V]$
+				\item Constant: unbiased ACF estimator
+				\item Variation 1: $N_1 = (64, 512, 1024, 4096)$ samples
+				\item Variation 2: $SNR = (5, 10, 15, 20)$ dB
+				\item Variation 3: $DF = (0, 2, 4)$
+				\item Variation 4: $N_{cy} = (1,\ldots,5)$ samples, subdivided into 81 steps
+				\item Variation 5: $N_{mc} = 500$ turns, Monte-Carlo test
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+	%
+	%-------------------------------------------------------------------------------------------------------------------
+	\section{Results}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} Signal power estimates, example I}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					%\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{xxx}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{xxx}\\
+				xxx\\
+				\vspace*{.5em}
+				\textbf{Observations}\\
+				\begin{itemize}
+					\item xxx
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	%-------------------------------------------------------------------------------------------------------------------
+	\section{Conclusions}
+	\begin{frame}
+		\frametitle{Conclusions}
+		% briefly summarize all observations
+		xxx
+		\vspace*{1em}
+		\begin{itemize}
+			\item xxx
+		\end{itemize}
+	\end{frame}
+	%
+	%-------------------------------------------------------------------------------------------------------------------
+	\section{Outlook}
+	\begin{frame}
+		\frametitle{Outlook}
+		% briefly describe further and connected research
+		xxx
+		\vspace*{1em}
+		\begin{itemize}
+			\item xxx
+		\end{itemize}
+		\vspace*{.5em}
+		\small \textbf{Note:} To support the future development of the proposed method, the supplementary GNU Octave code\autocite{progcode} and the \LaTeX{} code\autocite{texcode} of this presentation is made available publicly under open licenses.
+	\end{frame}
+	%
+	%-------------------------------------------------------------------------------------------------------------------
+	\section*{References}
+	\begin{frame}[noframenumbering]
+		\frametitle{References}
+		\printbibliography
+	\end{frame}
+	%
+	%===================================================================================================================
+	\appendix
+	\section{\appendixname}
+	%
+	\begin{frame}
+		\frametitle{\appendixname{} \textendash{} xxx}
+		xxx
+	\end{frame}
+	%
+	\begin{frame}[noframenumbering]
+		\frametitle{\appendixname{} \textendash{} Author information}
+		\RIPauthorinfo{}
+	\end{frame}
+	\begin{frame}[noframenumbering]
+		\frametitle{\appendixname{} \textendash{} Document license}
+		\expandafter\RIPcopyrightinfo\expandafter{\PresCopyrightType}
+	\end{frame}
+\end{document}

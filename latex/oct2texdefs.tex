@@ -1,0 +1,68 @@
+% TeX commands to conveniently use serialized dataset content
+%
+%#######################################################################################################################
+% LICENSE
+%
+% "oct2texdefs.tex" (C) 2024 by Jakob Harden (Graz University of Technology) is licensed under a Creative Commons Attribution 4.0 International license.
+%
+% License deed: https://creativecommons.org/licenses/by/4.0/
+% Author email: jakob.harden@tugraz.at, jakob.harden@student.tugraz.at, office@jakobharden.at
+% Author website: https://jakobharden.at/wordpress/
+% Author ORCID: https://orcid.org/0000-0002-5752-1785
+%
+% This file is part of the PhD thesis of Jakob Harden.
+%#######################################################################################################################
+%
+%
+%-------------------------------------------------------------------------------
+% Load etoolbox and other required pgf packages
+\usepackage{etoolbox} % if clauses
+\usepackage{pgf, pgfmath, pgfplots, pgfplotstable} % pgf functions
+%
+%-------------------------------------------------------------------------------
+% Structure path prefix
+% Note: The prefix is used to abbreviate long structure paths (variable names)
+%
+% Define default value of structure path prefix
+% Do not change that value unless you know what you are doing!
+\gdef\OTpfx{oct2tex}
+%
+% Set structure path prefix to a user defined value
+%   Parameter #1: user defined prefix (string without whitespace)
+%   Usage: \OTsetpfx{oct2tex.my.pre.fix}
+\newcommand{\OTsetpfx}[1]{\ifstrempty{#1}{\gdef\OTpfx{oct2tex}}{\gdef\OTpfx{#1}}}
+%
+% Reset structure path prefix to default value
+\newcommand{\OTresetpfx}{\gdef\OTpfx{oct2tex}}
+%
+%-------------------------------------------------------------------------------
+% Use serialized content from data structures in the document
+%
+% Use structure variable
+%   Parameter #1: variable name (structure path)
+%   Usage: \OTuse{my.struct.path.to.content.value}
+\newcommand{\OTuse}[1]{\csname \OTpfx.#1\endcsname}
+%
+% Use structure variable, fixed digit floating point number
+%   Parameter #1: variable name (structure path)
+%   Parameter #2: number of digits to display
+%   Usage: \OTusefixed{my.struct.path.to.content.value}{2}
+\newcommand{\OTusefixed}[2]{%
+	\pgfkeys{%
+		/pgf/number format/.cd,%
+		fixed,%
+		precision=#2,%
+		1000 sep={.}%
+	}%
+	\pgfmathprintnumber{\OTuse{#1}}%
+}
+%
+% Read tabulated value from structure and store result in the LaTeX command \OTtab
+%   Parameter #1: variable name (structure path)
+%   Usage: \OTread{my.struct.path.to.table}
+\newcommand{\OTread}[1]{\pgfplotstableread[col sep=semicolon,trim cells]{\OTpfx.#1}\OTtab}
+%
+% Read CSV file and store result in the LaTeX command \OTtabcsv
+%   Parameter #1: CSV file name
+%   Usage: \OTreadcsv{csv_filename}
+\newcommand{\OTreadcsv}[1]{\pgfplotstableread[col sep=semicolon,trim cells]{#1}\OTtabcsv}

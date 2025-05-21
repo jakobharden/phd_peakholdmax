@@ -1,0 +1,155 @@
+% !BIB TS-program = biblatex
+% !TeX spellcheck = en_US
+%
+%#######################################################################################################################
+% LICENSE
+%
+% "adaptthemePresRIP.tex" (C) 2024 by Jakob Harden (Graz University of Technology) is licensed under a Creative Commons Attribution 4.0 International license.
+%
+% License deed: https://creativecommons.org/licenses/by/4.0/
+% Author email: jakob.harden@tugraz.at, jakob.harden@student.tugraz.at, office@jakobharden.at
+% Author website: https://jakobharden.at/wordpress/
+% Author ORCID: https://orcid.org/0000-0002-5752-1785
+%
+% This file is part of the PhD thesis of Jakob Harden.
+%#######################################################################################################################
+%
+% Beamer theme adaptations
+%   type:        Presentation
+%   series:      Research in progress (RIP)
+%   description: This theme is designed to present preliminary research results.
+%
+% Beamer documentation: https://www.beamer.plus/Structuring-Presentation-The-Local-Structure.html
+%
+%-----------------------------------------------------------------------------------------------------------------------
+% color definitions
+\definecolor{RIPbgcol}{RGB}{255, 233, 148} % LibreOffice, Light Gold 3
+\definecolor{RIPsepcol}{RGB}{255, 191, 0} % LibreOffice, Gold
+\definecolor{RIPtitlecol}{RGB}{120, 75, 4} % LibreOffice, Dark Gold 3
+%
+% geometry definition
+\newlength{\RIPheadheight}
+\setlength{\RIPheadheight}{14mm}
+\newlength{\RIPfootheight}
+\setlength{\RIPfootheight}{9mm}
+%
+%-----------------------------------------------------------------------------------------------------------------------
+% commands
+% two-column mode, left column
+\newenvironment{RIPcolleft}{%
+		\begin{column}{.65\textwidth}%
+	}{%
+		\end{column}%
+	}
+%
+% two-column mode, right column
+\newenvironment{RIPcolright}{%
+		\hspace{.05\textwidth}%
+		\begin{column}{.3\textwidth}%
+	}{%
+		\end{column}%
+	}
+%
+% copyright information text block
+\newcommand{\RIPcopyrightinfo}[1]{%
+	Copyright \textcopyright{} \the\year{} \PresAuthor{} (\PresAuthorAffiliationLocation)\\
+	%This document is licensed under a Creative Commons Attribution 4.0 International license.
+	\ifstrequal{#1}{copyright}{All rights reserved.}{}
+	\ifstrequal{#1}{ccby}{%
+		This document is licensed under a Creative Commons Attribution 4.0 International license.\\
+		See also: \href{https://creativecommons.org/licenses/by/4.0/deed}{CC BY 4.0, license deed}
+	}{}%
+	\ifstrequal{#1}{ccbysa}{%
+		This document is licensed under a Creative Commons Attribution-Share Alike 4.0 International license.\\
+		See also: \href{https://creativecommons.org/licenses/by-sa/4.0/deed}{CC BY-SA 4.0, license deed}
+	}{}
+	\\
+	\vspace{1em}
+	The above license applies to the entire content of this document. Deviations from this license are explicitly marked.
+}
+%
+% author information text block
+\newcommand{\RIPauthorinfo}[1]{%
+	\renewcommand{\arraystretch}{1.25}
+	\begin{tabular}{l l}
+		First name & \PresAuthorFirstname{} \\
+		Last name & \PresAuthorLastname{} \\
+		Affiliation & \PresAuthorAffiliationLocation{} \\
+		Website & \href{\PresAuhtorWebsiteURL{}}{\PresAuhtorWebsite{}} \\
+		Email & \PresAuhtorEmailFirst{}, \PresAuhtorEmailSecond{}, \PresAuhtorEmailThird{} \\
+		ORCID & \href{\PresAuthorOrcidURL}{\PresAuthorOrcid{}} \\
+		LinkedIn & \href{\PresAuthorLinkedinURL}{\PresAuthorLinkedin{}}
+	\end{tabular}
+}
+%
+%-----------------------------------------------------------------------------------------------------------------------
+% define and adapt theme
+\usetheme{default} % presentation theme
+\useoutertheme{sidebar} % outer theme
+\useinnertheme{default} % inner theme
+%
+% size settings
+\setbeamersize{%
+	text margin left=5mm,
+	text margin right=5mm,
+	sidebar width left=0mm,
+	sidebar width right=0mm}
+%
+% headline settings
+\setbeamertemplate{headline}{%
+	\begin{minipage}[t]{\textwidth}
+		\begin{tikzpicture}
+			\fill[RIPbgcol] (0,0) -- ++(16, 0) -- ++(0,-\RIPheadheight) -- ++(-16,0) -- cycle;
+			\draw[RIPsepcol] (0,-\RIPheadheight) -- ++(16,0)
+				node[pos=0.988,left,yshift=.6\RIPheadheight,RIPtitlecol] {\Large\insertpagenumber};
+		\end{tikzpicture}
+	\end{minipage}
+}
+%
+% footline settings
+\setbeamertemplate{footline}{%
+	\begin{minipage}[t]{\textwidth}
+		\begin{tikzpicture}
+			\fill[RIPbgcol] (0,0) -- ++(16, 0) -- ++(0,-\RIPfootheight) -- ++(-16,0) -- cycle;
+			\draw[RIPsepcol] (0,0) -- ++(16,0)
+				node[pos=0.012,black,right,yshift=-4mm] {\small\PresFootInfo{}}
+				node[pos=0.988,black,left,yshift=-5mm]{
+					\parbox{35mm}{%
+						\raggedleft
+						\small\hfill\PresAuthor{}\newline
+						\tiny\PresAuthorAffiliation{}
+					}
+				};
+		\end{tikzpicture}
+	\end{minipage}
+}
+%
+% left sidebar settings
+\setbeamertemplate{sidebar canvas left}{}
+\setbeamertemplate{sidebar left}{}
+%
+% nagigation symbol settings
+\setbeamertemplate{navigation symbols}{}
+%
+% abstract settings
+\setbeamertemplate{abstract title}{\normalsize}
+\setbeamertemplate{abstract begin}{\small}
+\setbeamertemplate{abstract end}{}
+%
+% color settings
+\setbeamercolor{titlelike}{fg=RIPtitlecol}
+\setbeamercolor{bibliography entry author}{fg=RIPtitlecol}
+\setbeamercolor{bibliography entry note}{fg=RIPtitlecol}
+\setbeamercolor{bibliography item}{fg=black}
+\setbeamercolor{caption}{fg=black}
+\setbeamercolor{caption name}{fg=RIPtitlecol}
+%
+% itemization settings
+\setbeamertemplate{itemize item}{\color{RIPtitlecol}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{RIPtitlecol}$\blacksquare$}
+%
+% enumeration settings
+\setbeamertemplate{enumerate item}{\color{RIPtitlecol}\bfseries\insertenumlabel}
+%
+% bibliography settings
+\setbeamertemplate{bibliography item}{\insertbiblabel}
