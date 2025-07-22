@@ -77,6 +77,7 @@ function [r_ds, r_fh] = test_peakholdmax_signals(p_fs, p_nc, p_sp, p_snr, p_vm);
   
   ## generate signal, row vector
   [ss, nn, N] = tool_gen_signal(p_fs, p_nc, p_sp);
+  n_max = round(p_fs / (4 * p_sp(2)));
   
   ## get noise, column vector
   [vv, ~, ~, ~] = tool_scale_noise2snr(ss, p_vm(:, 1), p_snr);
@@ -90,10 +91,15 @@ function [r_ds, r_fh] = test_peakholdmax_signals(p_fs, p_nc, p_sp, p_snr, p_vm);
   hold(ah, 'on');
   plot(ah, nn, xx, ';x[n];', 'color', ones(1, 3) * 0.5, 'linewidth', 0.5);
   plot(ah, nn, ss, ';s[n];', 'color', [1, 0, 0], 'linewidth', 2);
+  plot(ah, n_max, ss(n_max), 'ok', 'linewidth', 2, 'handlevisibility', 'off');
+  plot(ah, [n_max, n_max * 2.5], [1, 1] * p_sp(1), '->k', 'handlevisibility', 'off');
+  text(ah, mean([n_max, n_max * 2.5]), p_sp(1) * 1.05, 'c_{lim}', 'fontsize', 12);
   hold(ah, 'off');
   title(ah, sprintf('Test signal\nF_s = %d Hz, A = %d V, F = %d Hz, SNR = %d dB', p_fs, p_sp(1), p_sp(2), p_snr));
   xlabel(ah, 'Signal index [1]');
   ylabel(ah, 'Amplitude [V]');
+  
+  r_ds = [];
   
 endfunction
 
@@ -193,7 +199,7 @@ function [r_ds, r_fh] = test_peakholdmax_snrvar(p_fs, p_nc, p_sp, p_vm);
   xlabel(ah, 'HPC / N [1]');
   ylabel(ah, 'SNR [dB]');
   
-  ## plot empirical variance
+  ## plot empirical standard deviation
   r_fh(3) = figure('name', 'empstd', 'position', [100, 100, 800, 0.62*800]);
   ah = axes(r_fh(3), 'tickdir', 'out');
   hold(ah, 'on');

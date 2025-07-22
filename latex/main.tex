@@ -1,5 +1,5 @@
 % !BIB TS-program = biblatex
-% !TeX spellcheck = en_US
+% !TeX spellcheck = en_BR
 %
 %#######################################################################################################################
 % LICENSE
@@ -38,9 +38,32 @@
 \usepackage[backend=biber,style=numeric]{biblatex}
 \addbibresource{biblio.bib}
 
+% breakable algorithm
+% by https://github.com/Tedxz/xjtuthesis-x/issues/1
+\makeatletter
+\newenvironment{breakablealgorithm}
+{% \begin{breakablealgorithm}
+	\begin{center}
+		\refstepcounter{algorithm}% New algorithm
+		\hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+		\renewcommand{\caption}[2][\relax]{% Make a new \caption
+			{\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}%
+			\ifx\relax##1\relax % #1 is \relax
+			\addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+			\else % #1 is not \relax
+			\addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+			\fi
+			\kern2pt\hrule\kern2pt
+		}
+	}{% \end{breakablealgorithm}
+		\kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+	\end{center}
+}
+\makeatother
+
 %
 % text blocks
-\def\PresTitle{Local maxima detection for sinusoidal signals corrupted by noise}
+\def\PresTitle{Local extreme value detection for sinusoidal signals corrupted by noise}
 \def\PresSubTitle{A numerical study on (damped) sinusoidal signals}
 \def\PresDate{25${}^{\text{st}}$ of May, 2025}
 \def\PresFootInfo{My PhD thesis, research in progress ...}
@@ -98,8 +121,15 @@
 	\begin{frame}
 		\frametitle{Abstract}
 		% german text
+%		Die Analyse von Ultraschallsignalen ist von der Analyse der Signaldaten im Zeitbereich geprägt. Beim Ultraschall-Puls Transmissionsverfahren zielt die Signalanalyse zumeist auf das Detektieren des Ansatzpunktes der eintreffenden Kompressions- oder Scherwelle ab. Damit lässt sich die Schalllaufzeit, und bei bekannter Messdistanz auch die Schallgeschwindigkeit als wesentlichen Materialparameter bestimmen.
+%		
+%		Dieser Ansatzpunkt ist aufgrund des Signalrauschens und eventuell vorhandener Interferenzen nicht immer einfach zu lokalisieren. Als Hilfsmittel und zur Stabilisierung der Signalanalyse ist es sinnvoll, das erste lokale Extremum (Minimum oder Maximum) direkt hinter dem Ansatzpunkt der Kompressions- oder Scherwelle zu bestimmen. Damit kann das Suchintervall für den Ansatzpunkt deutlich eingeschränkt und die Robustheit der gesamten nachfolgenden Analyse erhöht werden.
+%		
+%		Wie die Erfahrung zeigt, ist das erste lokale Minimum oder Maximum nicht immer mit dem globalen Minimum oder Maximum ident. Dieser Umstand führt sehr leicht zu einer Falsch-Detektion. In dieser Arbeit wird ein Suchverfahren vorgestellt, das die robuste Detektion des ersten lokalen Extremums ermöglicht und gleichzeitig einen moderaten Berechnungsaufwand mit sich bringt.
 		\begin{abstract}
-			%TODO: write abstract
+			The analysis of ultrasonic signals is characterised by the analysis of signal data in the time domain. In the ultrasonic pulse transmission method, the signal analysis is often aimed at detecting the onset point of the incoming compression or shear wave. This makes it possible to determine the sound propagation time and, if the measuring distance is known, the speed of sound as an essential material parameter.
+			This starting point is not always easy to localise due to signal noise and possible interference. As an aid and to stabilise the signal analysis, it is useful to estimate the location of the first local extreme value (minimum or maximum) directly behind the onset point of the compression or shear wave. This can significantly reduce the search interval for the onset point and increase the robustness of the entire subsequent analysis.
+			Experience shows that the first local minimum or maximum is not always identical to the global minimum or maximum. This circumstance very easily leads to a false detection. In this work, a search method is presented that enables the robust detection of the first local extreme and comes with a moderate computational effort.
 		\end{abstract}
 	\end{frame}
 	%
@@ -110,25 +140,24 @@
 		\begin{itemize}
 			\item \textcolor{RIPtitlecol}{WHAT}
 			\begin{itemize}
-				\item xxx
-				\item xxx
+				\item Ultrasound signals, compression/primary waves (P-wave), shear/secondary waves (S-wave)
+				\item Locate the first local extreme value (minimum or maximum)
 			\end{itemize}
 			\item \textcolor{RIPtitlecol}{WHY}
 			\begin{itemize}
-				\item xxx
-				\item xxx
+				\item Narrow down the search interval for the P-wave or S-wave onset point detection
+				\item Increase the robustness of subsequent signal analysis
 			\end{itemize}
 			\item \textcolor{RIPtitlecol}{HOW}
 			\begin{itemize}
-				\item xxx
-				\item xxx
+				\item Loop over the signal index until a predefined number of following signal amplitudes are \textbf{lower} (maximum) or \textbf{higher} (minimum) than the current amplitude.
 			\end{itemize}
 			\item \textcolor{RIPtitlecol}{USAGE}
 				\begin{itemize}
-					\item xxx
-					\item xxx
+					\item P-wave and S-wave signal responses (natural signals)
+					\item Normalise signal amplitudes w.r.t. the first local maximum
 				\end{itemize}
-			\item \textcolor{RIPtitlecol}{HIGHLIGHT} \textbf{xxx}
+			\item \textcolor{RIPtitlecol}{HIGHLIGHT} \textbf{robust method, moderate computational effort}
 		\end{itemize}
 	\end{frame}
 	%
@@ -136,37 +165,65 @@
 	\section{Materials \& Methods}
 	\begin{frame}
 		\frametitle{Materials \& Methods I}
-		\begin{columns}
-			\begin{RIPcolleft}
-				\begin{itemize}
-					\setlength\itemsep{0.5em}
-					\item \textcolor{RIPtitlecol}{Materials}
-					\begin{itemize}
-						\setlength\itemsep{0.5em}
-						\item xxx
-					\end{itemize}
-				\end{itemize}
-			\end{RIPcolleft}
-			\begin{RIPcolright}
-				\textbf{xxx}\\
-				\vspace{1em}
-				%\includegraphics[width=40mm,trim={15mm 10mm 20mm 20mm}, clip]{xxx}
-			\end{RIPcolright}
-		\end{columns}
+		\begin{itemize}
+			\setlength\itemsep{0.5em}
+			\item \textcolor{RIPtitlecol}{Materials}
+			\begin{itemize}
+				\setlength\itemsep{0.5em}
+				\item (Damped) sinusoidal signals corrupted by additive noise
+				\item discrete-time signals typical for ultrasonic pulse transmission tests
+			\end{itemize}
+			\item \textcolor{RIPtitlecol}{Methods}
+			\begin{itemize}
+				\setlength\itemsep{0.5em}
+				\item Maximum detection algorithm (see page \pageref{algo:detection})
+				\item Numerical study 1: evaluate the impact of noise (see page \pageref{algo:detection})
+			\end{itemize}
+		\end{itemize}
 	\end{frame}
 	%
 	\begin{frame}
 		\frametitle{Materials \& Methods II}
-		\begin{itemize}
-			\setlength\itemsep{0.5em}
-			\item \textcolor{RIPtitlecol}{Methods}
-			\begin{itemize}
-				\setlength\itemsep{0.5em}
-				\item xxx
-			\end{itemize}
-		\end{itemize}
-		\vspace*{.5em}
-		\small \textbf{Note:} xxx.
+		\small
+		\begin{tabbing}
+			\textbf{Detection algorithm}\label{algo:detection} \\
+			\hspace{0.4cm} \= \hspace{0.4cm} \= \hspace{0.4cm} \= \hspace{0.5cm} \= \kill
+			 \> Given: $x \ldots$~signal, $n_i \ldots$~detection start index, $c_{\lim} \ldots$~counter limit \\
+			 \> Optional: $L_d \ldots$~detection window length \\
+			 1: \> $[v_{\max}, n_{\max}]$ = \textsc{PeakHoldMax}($x, n_i, c_{\lim}, L_d$) \\
+			 2: \> \> $v_m, n_m \gets \max(x[n_i \leq n \leq |x|])$ \\
+			 3: \> \> $L_{d,\max} \gets |x| - n_i + 1$ \\
+			 4: \> \> \textbf{if} ($L_d = [\;]$) \\
+			 5: \> \> \> $L_d \gets L_{d,\max}$ \\
+			 6: \> \> \textbf{else} \\
+			 7: \> \> \> $L_d \gets \min(L_d, L_{d,\max})$ \\
+			 8: \> \> \textbf{endif} \\
+			 9: \> \> $x[n] \gets 0, \; \forall \; x[n] \leq \frac{v_m}{5}$ \\
+			 10: \> \> $a \gets min(x[n_i \leq n \leq |x|])$ \\
+			 11: \> \> $c \gets 0$ \\
+		\end{tabbing}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Materials \& Methods III}
+		\small
+		\begin{tabbing}
+			\hspace{0.5cm} \= \hspace{0.5cm} \= \hspace{0.5cm} \= \hspace{0.5cm} \= \kill
+			12: \> \> \textbf{for} $n \in n_i \leq n \leq (n_i + L_d - 1)$ \\
+			13: \> \> \> \textbf{if} ($x[n] \geq a$)\\
+			14: \> \> \> \> $a \gets x[n]$ \\
+			15: \> \> \> \> $c = 0$ \\
+			16: \> \> \> \textbf{else}\\
+			17: \> \> \> \> $c \gets c + 1$\\
+			18: \> \> \> \textbf{endif}\\
+			19: \> \> \> \textbf{if} ($c = c_{\lim}$) \\
+			20: \> \> \> \> $v_{\max} \gets a$ \\
+			21: \> \> \> \> $n_{\max} \gets n - c_{\lim}$ \\
+			22: \> \> \> \> \textbf{break}\\
+			23: \> \> \> \textbf{endif}\\
+			24: \> \> \textbf{endfor} \\
+			24: \> \textbf{endfunction} \\
+		\end{tabbing}
 	\end{frame}
 	%
 	\begin{frame}
