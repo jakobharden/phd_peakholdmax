@@ -7,7 +7,7 @@
 
 The analysis of ultrasonic signals is characterised by the analysis of signal data in time domain. In the ultrasonic pulse transmission method, the signal analysis is often aimed at detecting the onset point of the incoming compression or shear wave. This makes it possible to determine the sound propagation time and, if the measuring distance is known, the speed of sound as an essential material parameter.
 
-This starting point is not always easy to localise due to signal noise and possible interference. As an aid and to stabilise the signal analysis, it is useful to estimate the location of the first local extreme value (minimum or maximum) directly behind the onset point of the compression or shear wave. This can significantly reduce the search interval for the onset point and increase the robustness of the entire subsequent analysis.
+This onset point is not always easy to localise due to signal noise and possible interference. As an aid and to stabilise the signal analysis, it is useful to estimate the location of the first local extreme value (minimum or maximum) directly behind the onset point of the compression or shear wave. This can significantly reduce the search interval for the onset point and increase the robustness of the entire subsequent analysis.
 
 Experience shows that the first local minimum or maximum is not always identical to the global minimum or maximum. This circumstance very easily leads to false detection. In this work, a search method is presented that enables the robust detection of the first local extreme value's location and comes with a moderate computational effort.
 
