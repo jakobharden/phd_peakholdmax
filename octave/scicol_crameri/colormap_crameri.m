@@ -1,6 +1,6 @@
 ## Load colormaps desgined by Fabio Crameri et. al., version 8
 ##
-## Usage: colormap_crameri(p_cmn, p_num)
+## Usage: [r_cm, r_fh] = colormap_crameri(p_cmn, p_num)
 ##
 ## p_cmn ... colourmap name, <str>
 ## p_num ... number of colours, <uint>

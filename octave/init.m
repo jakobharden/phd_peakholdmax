@@ -25,10 +25,6 @@
 ##
 function init()
   
-  ## load packages
-  pkg load signal;
-  pkg load statistics;
-  
   ## add subdirectories to path environment variable
   addpath('tools');
   addpath('scicol_crameri');
