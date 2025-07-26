@@ -23,8 +23,7 @@ Experience shows that the first local minimum or maximum is not always identical
 - [Installation instructions](#installation-instructions)
 - [Usage instructions](#usage-instructions)
 - [Help and Documentation](#help-and-documentation)
-- [Related data sources](#related-data-sources)
-- [Related software](#related-software)
+- [Related work](#related-work)
 - [Revision and release history](#revision-and-release-history)
 
 
