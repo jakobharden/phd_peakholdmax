@@ -181,7 +181,7 @@ The local extreme value detection method presented here is used in other publica
 
 - published/released version 1.0.0, by Jakob Harden   
 - URL: [Repository of Graz University of Technology](https://repository.tugraz.at/)   
-- Presentation, DOI: [xxxx](https://doi.org/xxxx)   
-- GNU Octave code, DOI: [xxxx](https://doi.org/xxxx)   
-- LaTeX code, DOI: [xxxx](https://doi.org/xxxx)   
+- Presentation, DOI: [10.3217/yj25h-0h842](https://doi.org/10.3217/yj25h-0h842)   
+- GNU Octave code, DOI: [10.3217/m8cyc-2pd96](https://doi.org/10.3217/m8cyc-2pd96)   
+- LaTeX code, DOI: [10.3217/tvap0-9y787](https://doi.org/10.3217/tvap0-9y787)   
 
