@@ -37,35 +37,12 @@
 \usepackage{hyperref}
 \usepackage[backend=biber,style=numeric]{biblatex}
 \addbibresource{biblio.bib}
-
-% breakable algorithm
-% by https://github.com/Tedxz/xjtuthesis-x/issues/1
-\makeatletter
-\newenvironment{breakablealgorithm}
-{% \begin{breakablealgorithm}
-	\begin{center}
-		\refstepcounter{algorithm}% New algorithm
-		\hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
-		\renewcommand{\caption}[2][\relax]{% Make a new \caption
-			{\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}%
-			\ifx\relax##1\relax % #1 is \relax
-			\addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
-			\else % #1 is not \relax
-			\addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
-			\fi
-			\kern2pt\hrule\kern2pt
-		}
-	}{% \end{breakablealgorithm}
-		\kern2pt\hrule\relax% \@fs@post for \@fs@ruled
-	\end{center}
-}
-\makeatother
-
 %
 % text blocks
 \def\PresTitle{Local extreme value detection for sinusoidal signals corrupted by noise}
 \def\PresSubTitle{A numerical study on (damped) sinusoidal signals}
-\def\PresDate{25${}^{\text{st}}$ of May, 2025}
+%\def\PresDate{25${}^{\text{th}}$ of July, 2025}
+\def\PresDate{\today}
 \def\PresFootInfo{My PhD thesis, research in progress ...}
 \def\PresAuthorFirstname{Jakob}
 \def\PresAuthorLastname{Harden}
@@ -89,14 +66,8 @@
 %   description: This theme is designed to present preliminary research results.
 \input{adaptthemePresRIP}
 %
-% Load Octave to TeX tool
-\input{oct2texdefs}
-%
-% graphics path
-\graphicspath{{../octave/results/test_peakholdmax}}
-%
 % computation result path
-\newcommand{\RPATH}{../octave/results/test_peakholdmax}
+\newcommand{\Ufigurefile}[1]{../octave/results/test_peakholdmax/png/#1}
 %
 %#######################################################################################################################
 \begin{document}
@@ -127,9 +98,9 @@
 %		
 %		Wie die Erfahrung zeigt, ist das erste lokale Minimum oder Maximum nicht immer mit dem globalen Minimum oder Maximum ident. Dieser Umstand führt sehr leicht zu einer Falsch-Detektion. In dieser Arbeit wird ein Suchverfahren vorgestellt, das die robuste Detektion des ersten lokalen Extremums ermöglicht und gleichzeitig einen moderaten Berechnungsaufwand mit sich bringt.
 		\begin{abstract}
-			The analysis of ultrasonic signals is characterised by the analysis of signal data in the time domain. In the ultrasonic pulse transmission method, the signal analysis is often aimed at detecting the onset point of the incoming compression or shear wave. This makes it possible to determine the sound propagation time and, if the measuring distance is known, the speed of sound as an essential material parameter.
+			The analysis of ultrasonic signals is characterised by the analysis of signal data in time domain. In the ultrasonic pulse transmission method, the signal analysis is often aimed at detecting the onset point of the incoming compression or shear wave. This makes it possible to determine the sound propagation time and, if the measuring distance is known, the speed of sound as an essential material parameter.
 			This starting point is not always easy to localise due to signal noise and possible interference. As an aid and to stabilise the signal analysis, it is useful to estimate the location of the first local extreme value (minimum or maximum) directly behind the onset point of the compression or shear wave. This can significantly reduce the search interval for the onset point and increase the robustness of the entire subsequent analysis.
-			Experience shows that the first local minimum or maximum is not always identical to the global minimum or maximum. This circumstance very easily leads to a false detection. In this work, a search method is presented that enables the robust detection of the first local extreme and comes with a moderate computational effort.
+			Experience shows that the first local minimum or maximum is not always identical to the global minimum or maximum. This circumstance very easily leads to false detection. In this work, a search method is presented that enables the robust detection of the first local extreme value's location and comes with a moderate computational effort.
 		\end{abstract}
 	\end{frame}
 	%
@@ -150,14 +121,14 @@
 			\end{itemize}
 			\item \textcolor{RIPtitlecol}{HOW}
 			\begin{itemize}
-				\item Loop over the signal index until a predefined number of following signal amplitudes are \textbf{lower} (maximum) or \textbf{higher} (minimum) than the current amplitude.
+				\item Advance through the signal index until a predefined number of subsequent signal amplitudes are lower than the current amplitude.
 			\end{itemize}
 			\item \textcolor{RIPtitlecol}{USAGE}
 				\begin{itemize}
-					\item P-wave and S-wave signal responses (natural signals)
-					\item Normalise signal amplitudes w.r.t. the first local maximum
+					\item MIN/MAX detection for P-wave and S-wave signal responses (ultrasonic signals)
+					\item Normalise signal amplitudes w.r.t. the first local extreme value or scale threshold values.
 				\end{itemize}
-			\item \textcolor{RIPtitlecol}{HIGHLIGHT} \textbf{robust method, moderate computational effort}
+			\item \textcolor{RIPtitlecol}{HIGHLIGHT} \textbf{robust method for $SNR \geq 24$~dB}
 		\end{itemize}
 	\end{frame}
 	%
@@ -171,98 +142,470 @@
 			\begin{itemize}
 				\setlength\itemsep{0.5em}
 				\item (Damped) sinusoidal signals corrupted by additive noise
-				\item discrete-time signals typical for ultrasonic pulse transmission tests
+				\item Signal model (clean signal):
+				\begin{equation}
+					s[n] = A \cdot sin\left(2 \, \pi \, N_c \, \frac{n}{N}\right) \cdot e^{\beta \, \frac{n}{N}}, \; 0 \leq n \leq N-1 \label{eq:sigmodel}
+				\end{equation}
+				\item $N_c \ldots$~number of cycles, $\beta \ldots$~damping/amplification factor, $A \ldots$~amplitude scaling factor
+				\item Signal corrupted by noise: $x = s + \nu$, $\nu \ldots$ Gaussian white noise (GWN)
 			\end{itemize}
 			\item \textcolor{RIPtitlecol}{Methods}
 			\begin{itemize}
 				\setlength\itemsep{0.5em}
 				\item Maximum detection algorithm (see page \pageref{algo:detection})
-				\item Numerical study 1: evaluate the impact of noise (see page \pageref{algo:detection})
+				\item Numerical study to evaluate the impact of noise and exponential damping/amplification (see page \pageref{param:study})
 			\end{itemize}
 		\end{itemize}
 	\end{frame}
 	%
 	\begin{frame}
-		\frametitle{Materials \& Methods II}
+		\frametitle{Materials \& Methods \textendash{} Algorithm, part I}\label{algo:detection}
 		\small
 		\begin{tabbing}
-			\textbf{Detection algorithm}\label{algo:detection} \\
+			\textbf{Detection algorithm} \\
 			\hspace{0.4cm} \= \hspace{0.4cm} \= \hspace{0.4cm} \= \hspace{0.5cm} \= \kill
 			 \> Given: $x \ldots$~signal, $n_i \ldots$~detection start index, $c_{\lim} \ldots$~counter limit \\
 			 \> Optional: $L_d \ldots$~detection window length \\
-			 1: \> $[v_{\max}, n_{\max}]$ = \textsc{PeakHoldMax}($x, n_i, c_{\lim}, L_d$) \\
-			 2: \> \> $v_m, n_m \gets \max(x[n_i \leq n \leq |x|])$ \\
-			 3: \> \> $L_{d,\max} \gets |x| - n_i + 1$ \\
+			 1: \> $[v_{\max}, n_{\max}]$ = \textsc{DetectLocalMax}($x, n_i, c_{\lim}, L_d$) \\
+			 2: \> \> $v_m, n_m \gets \max(x[n]), \; n_i \leq n \leq |x| \quad \triangleleft \text{determine global maximum}$ \\
+			 3: \> \> $L_{d,\max} \gets |x| - n_i + 1 \quad \triangleleft \text{limit detection window length to signal length}$ \\
 			 4: \> \> \textbf{if} ($L_d = [\;]$) \\
 			 5: \> \> \> $L_d \gets L_{d,\max}$ \\
 			 6: \> \> \textbf{else} \\
 			 7: \> \> \> $L_d \gets \min(L_d, L_{d,\max})$ \\
 			 8: \> \> \textbf{endif} \\
-			 9: \> \> $x[n] \gets 0, \; \forall \; x[n] \leq \frac{v_m}{5}$ \\
-			 10: \> \> $a \gets min(x[n_i \leq n \leq |x|])$ \\
-			 11: \> \> $c \gets 0$ \\
+			 9: \> \> $x[n] \gets 0, \; 0 \leq ||x[n]|| \leq \frac{v_{\max}}{5} \quad \triangleleft \text{remove noise floor, increase detection robustness}$ \\
+			 10: \> \> $a \gets min(x[n]), \; n_i \leq n \leq |x| \quad \triangleleft \text{initialize temporary maximum amplitude}$ \\
+			 11: \> \> $c \gets 0 \quad \triangleleft \text{initialize amplitude counter}$ \\
+			 continued on next page $\ldots$\\
 		\end{tabbing}
 	\end{frame}
 	%
 	\begin{frame}
-		\frametitle{Materials \& Methods III}
+		\frametitle{Materials \& Methods \textendash{} Algorithm, part II}
 		\small
 		\begin{tabbing}
 			\hspace{0.5cm} \= \hspace{0.5cm} \= \hspace{0.5cm} \= \hspace{0.5cm} \= \kill
-			12: \> \> \textbf{for} $n \in n_i \leq n \leq (n_i + L_d - 1)$ \\
-			13: \> \> \> \textbf{if} ($x[n] \geq a$)\\
-			14: \> \> \> \> $a \gets x[n]$ \\
-			15: \> \> \> \> $c = 0$ \\
-			16: \> \> \> \textbf{else}\\
-			17: \> \> \> \> $c \gets c + 1$\\
-			18: \> \> \> \textbf{endif}\\
-			19: \> \> \> \textbf{if} ($c = c_{\lim}$) \\
-			20: \> \> \> \> $v_{\max} \gets a$ \\
-			21: \> \> \> \> $n_{\max} \gets n - c_{\lim}$ \\
-			22: \> \> \> \> \textbf{break}\\
-			23: \> \> \> \textbf{endif}\\
+			12: \> \> \textbf{for} $n \in n_i \leq n \leq (n_i + L_d - 1) \quad \triangleleft \text{loop through the signal's detection window}$ \\
+			13: \> \> \> \textbf{if} ($x[n] \geq a$) $\quad \triangleleft \text{ classify current amplitude}$ \\
+			14: \> \> \> \> $a \gets x[n] \quad \triangleleft \text{update temporary maximum amplitude}$ \\
+			15: \> \> \> \> $c = 0 \quad \triangleleft \text{reset amplitude counter}$ \\
+			16: \> \> \> \textbf{else} \\
+			17: \> \> \> \> $c \gets c + 1 \quad \triangleleft \text{increase amplitude counter}$ \\
+			18: \> \> \> \textbf{endif} \\
+			19: \> \> \> \textbf{if} ($c = c_{\lim}$) $\quad \triangleleft \text{ evaluate detection condition}$ \\
+			20: \> \> \> \> $v_{\max} \gets a \quad \triangleleft \text{return the local maximum's amplitude}$ \\
+			21: \> \> \> \> $n_{\max} \gets n - c_{\lim} \quad \triangleleft \text{return the local maximum's location}$ \\
+			22: \> \> \> \> \textbf{break} $\quad \triangleleft \text{ break loop, successful detection}$ \\
+			23: \> \> \> \textbf{endif} \\
 			24: \> \> \textbf{endfor} \\
-			24: \> \textbf{endfunction} \\
+			25: \> \textbf{endfunction} \\
 		\end{tabbing}
+		\textbf{Note:} If the detection condition is \textbf{never satisfied}, the algorithm returns the global maximum amplitude and it's location.
 	\end{frame}
 	%
 	\begin{frame}
-		\frametitle{Materials \& Methods III}
-		To study the algorithm, a parameter variation was carried out using the following parameters.
+		\frametitle{Materials \& Methods \textendash{} Parameter study, part I}\label{param:study}
+		To study the algorithm, a parameter variation was carried out using the following parameters.\\
+		%\vspace*{-1em}
 		\begin{itemize}
 			\setlength\itemsep{0.5em}
-			\item \textcolor{RIPtitlecol}{Numerical study - parameter variation}
+			\item \textcolor{RIPtitlecol}{Constants}
 			\begin{itemize}
 				\setlength\itemsep{0.5em}
-				\item Constant: $A = 1 \quad [V]$
-				\item Constant: unbiased ACF estimator
-				\item Variation 1: $N_1 = (64, 512, 1024, 4096)$ samples
-				\item Variation 2: $SNR = (5, 10, 15, 20)$ dB
-				\item Variation 3: $DF = (0, 2, 4)$
-				\item Variation 4: $N_{cy} = (1,\ldots,5)$ samples, subdivided into 81 steps
-				\item Variation 5: $N_{mc} = 500$ turns, Monte-Carlo test
+				\item Sampling rate $F_s = 4$~kHz
+				\item Amplitude scaling factor $A = 1$; Frequency $F = 1$~Hz
+				\item Number of cycles, $N_c = 2$
+				\item Number of samples of one full cycle, $N_1 = 4000$~samples
+				\item Damping factor $\beta$ is one of $[-0.5, -0.25, 0, 0.25, 0.5]$
+			\end{itemize}
+			\item \textcolor{RIPtitlecol}{Parameter variation}
+			\begin{itemize}
+				\setlength\itemsep{0.5em}
+				\item Signal-to-noise ratio $0 \leq \text{SNR} \leq 63$~dB (interval subdivided into 22 steps)
+				\item Counter limit $1 \leq c_{\lim} \leq N_1$~samples (interval subdivided into 21 steps)
+				\item Monte-Carlo simulation for each parameter pair ($SNR$, $c_{\lim}$), $N_{MC} = 500$ turns
 			\end{itemize}
 		\end{itemize}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Materials \& Methods \textendash{} Parameter study, part II}
+		The detection results from the parameter variation are assessed with regard to two criteria: (1) validity, (2) accuracy and precision.\\
+		\vspace*{1em}
+		\textbf{Validity:} Valid detection results are located within a symmetric interval around the exact maximum point location $n_{\max,exact}$, where the interval length $L_{\text{det}}$ is a quarter of the wave length $N_1$ (window of accepted solutions). Results outside this interval are rejected.\\
+		\vspace*{1em}
+		\textbf{Accuracy and precision:} The detection error is here defined by the difference between the detected local maximum (signal corrupted by noise) and the exact solution for the local maximum (clean signal) normalised w.r.t. the wave length $N_1$. $e = (n_{\max,\text{det}} - n_{\max,\text{exact}}) / N_1 \cdot 100$~[\%]. The accuracy is expressed by the mean $\mu(e)$ and the precision by the empirical standard deviation $\sigma(e)$ of $N_{MC}$ detection error results of the Monte-Carlo simulation.
 	\end{frame}
 	%
 	%-------------------------------------------------------------------------------------------------------------------
 	\section{Results}
 	%
+	\def\Utestsig{Test signal}
+	\def\Udetstate{Detection state}
+	\def\Uerrrelmean{Relative maximum point location error, mean}
+	\def\Uerrrelstd{Relative maximum point location error, empirical standard deviation}
+	%
+	\def\Uframetitle{Damped sinusoidal signal 1}
 	\begin{frame}
-		\frametitle{Results \textendash{} Signal power estimates, example I}
+		\frametitle{Results \textendash{} \Uframetitle}
 		\begin{columns}[t]
 			\begin{RIPcolleft}
 				\begin{figure}
-					%\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{xxx}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{sig1}}
 				\end{figure}
 			\end{RIPcolleft}
 			\begin{RIPcolright}
-				\textbf{xxx}\\
-				xxx\\
+				\textbf{\Utestsig}\\
+				moderate damping $\beta = -0.5$\\
+				\vspace*{.5em}
+				\textbf{Observation:}\\
+				The detection does not run into the subsequent lobe of the signal. $c_{\lim}$ may take any value above a lower limit which is related to the noise power.
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar1_1}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Udetstate}\\
+				\begin{itemize}
+					\item $SNR < 6$~dB: all results are rejected
+					\item $SNR \geq 6$~dB: the maximum of $c_{\lim} / N_1$ has no upper limit
+					\item $SNR < 24$~dB: min. $c_{\lim} / N_1$ is increasing due to increasing noise power
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar1_4}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Uerrrelmean}\\
+				\begin{itemize}
+					\item $\mu(e)$ below 1 \% of the wave length $N_1$
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar1_5}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Uerrrelstd}\\
+				\begin{itemize}
+					\item $\sigma(e)$ below 2 \% of the wave length $N_1$
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	%----------
+	%
+	\def\Uframetitle{Damped sinusoidal signal 2}
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{sig2}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Utestsig}\\
+				low damping, $\beta = -0.25$\\
 				\vspace*{.5em}
 				\textbf{Observations}\\
+				The detection does not run into the subsequent lobe of the signal. $c_{\lim}$ may take any value above a lower limit, which is related to the noise power.
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar2_1}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Udetstate}\\
 				\begin{itemize}
-					\item xxx
+					\item $SNR < 9$~dB: all results are rejected
+					\item $SNR \geq 12$~dB: the maximum of $c_{\lim} / N_1$ has no upper limit
+					\item $SNR < 24$~dB: min. $c_{\lim} / N_1$ is increasing and max. $c_{\lim} / N_1$ is decreasing due to increasing noise power
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar2_4}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Uerrrelmean}\\
+				\begin{itemize}
+					\item $\mu(e)$ below 1 \% of the wave length $N_1$
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar2_5}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Uerrrelstd}\\
+				\begin{itemize}
+					\item $\sigma(e)$ below 2 \% of the wave length $N_1$
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	%----------
+	%
+	\def\Uframetitle{Pure sinusoidal signal}
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{sig3}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Utestsig}\\
+				without damping\\
+				\vspace*{.5em}
+				\textbf{Observations}\\
+				The detection may run into the subsequent lobe of the signal. $c_{\lim}$ has a lower and upper boundary, which is related to the noise power and the signal's shape.
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar3_1}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Udetstate}\\
+				\begin{itemize}
+					\item $SNR < 9$~dB: all results are rejected
+					\item $SNR < 30$~dB: min. $c_{\lim} / N_1$ is increasing and max. $c_{\lim} / N_1$ is decreasing due to increasing noise power
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar3_4}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Uerrrelmean}\\
+				\begin{itemize}
+					\item $\mu(e)$ below 1 \% of the wave length $N_1$
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar3_5}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Uerrrelstd}\\
+				\begin{itemize}
+					\item $\sigma(e)$ below 2 \% of the wave length $N_1$
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	%----------
+	%
+	\def\Uframetitle{Amplified sinusoidal signal 1}
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{sig4}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Utestsig}\\
+				low amplification, $\beta = 0.25$\\
+				\vspace*{.5em}
+				\textbf{Observations}\\
+				The detection may run into the subsequent lobe of the signal. $c_{\lim}$ has a lower and upper boundary, which is related to the noise power and the signal's shape.
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar4_1}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Udetstate}\\
+				\begin{itemize}
+					\item $SNR < 9$~dB: all results are rejected
+					\item $SNR < 24$~dB: min. $c_{\lim} / N_1$ is increasing and max. $c_{\lim} / N_1$ is decreasing due to increasing noise power
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar4_4}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Uerrrelmean}\\
+				\begin{itemize}
+					\item $\mu(e)$ below 1 \% of the wave length $N_1$
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar4_5}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Uerrrelstd}\\
+				\begin{itemize}
+					\item $\sigma(e)$ below 3 \% of the wave length $N_1$
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	%----------
+	%
+	\def\Uframetitle{Amplified sinusoidal signal 2}
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{sig5}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Utestsig}\\
+				moderate amplification, $\beta = 0.5$\\
+				\vspace*{.5em}
+				\textbf{Observations}\\
+				The detection may run into the subsequent lobe of the signal. $c_{\lim}$ has a lower and upper boundary, which is related to the noise power and the signal's shape.
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar5_1}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Udetstate}\\
+				\begin{itemize}
+					\item $SNR < 12$~dB: all results are rejected
+					\item $SNR < 27$~dB: min. $c_{\lim} / N_1$ is increasing and max. $c_{\lim} / N_1$ is decreasing due to increasing noise power
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar5_4}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Uerrrelmean}\\
+				\begin{itemize}
+					\item $\mu(e)$ below 1 \% of the wave length $N_1$
+				\end{itemize}
+			\end{RIPcolright}
+		\end{columns}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{Results \textendash{} \Uframetitle}
+		\begin{columns}[t]
+			\begin{RIPcolleft}
+				\begin{figure}
+					\includegraphics[width=100mm,trim= 5mm 0mm 5mm 50mm]{\Ufigurefile{snrvar5_5}}
+				\end{figure}
+			\end{RIPcolleft}
+			\begin{RIPcolright}
+				\textbf{\Uerrrelstd}\\
+				\begin{itemize}
+					\item $\sigma(e)$ below 3 \% of the wave length $N_1$
 				\end{itemize}
 			\end{RIPcolright}
 		\end{columns}
@@ -273,10 +616,15 @@
 	\begin{frame}
 		\frametitle{Conclusions}
 		% briefly summarize all observations
-		xxx
-		\vspace*{1em}
+		Based on the chosen signal model (see Eq. \eqref{eq:sigmodel}, page \pageref{eq:sigmodel}) and it's parametrisation (see page \pageref{param:study}) the following conclusions can be drawn.
 		\begin{itemize}
-			\item xxx
+			\item The detection method is likely to fail below a signal-to-noise ratio (SNR) of 12 dB. Accuracy and precision are decreasing considerably when the SNR approaches this detection limit. For $SNR \geq 12$~dB and $0.15 \leq c_{\lim} / N_1 \leq 0.75$ the method is robust regarding false detections.
+			%
+			\item Accuracy and precision of the first local maximum's location are in a usable range when the SNR is above 24 dB. $\mu < 1 \%$, $\sigma < 3 \%$ of the wave length $N_1$.
+			%
+			\item The lower limit of $c_{\lim}$ is approx. 5 \% of $N_1$ for a SNR above 24 dB. Below 24 dB, the lower limit of $c_{\lim}$ is increasing with decreasing SNR.
+			%
+			\item The upper limit of $c_{\lim}$ depends on the noise power but mainly on the damping factor. For damped signals, the upper limit of $c_{\lim}$ vanishes altogether. For amplified signals, the upper limit of $c_{\lim}$ is decreasing with increasing amplification factor and noise power.
 		\end{itemize}
 	\end{frame}
 	%
@@ -285,29 +633,52 @@
 	\begin{frame}
 		\frametitle{Outlook}
 		% briefly describe further and connected research
-		xxx
-		\vspace*{1em}
-		\begin{itemize}
-			\item xxx
-		\end{itemize}
+%		Die hier gezeigten Ergebnisse liefern wertvolle Hinweise für die Parametrierung der Detektionsmethode, insbesondere der günstigen Wahl des Parameters $c_{lim}$ abhängig von der Wellenlänge des Signals. Diese werden vom Autor dieser Arbeit in weiterer Folge für die Detektion des ersten lokalen Maximums bzw. Minimums der Signalantworten der Kompressions- bzw. der Scherwelle von Ultraschall-Signalaufzeichnungen benötigt.
+%		Nützliche Hinweise zur Anwendung der hier vorgestellten Methode finden sich im Anhang (siehe Seite \pageref{sec:appendix}).
+		The results presented here provide valuable information for parameterising the detection method, particularly in terms of the favourable choice of the parameter $c_{lim}$, which depends on the signal wavelength, the SNR, and the damping/amplification factor. The author of this work subsequently uses these for the detection of the first local maximum or minimum of the signal responses of the compression or shear wave of ultrasonic signal recordings\cite{webpaper2,webpaper3}.
+		Helpful information on the application of the method can be found in the appendix of this presentation (see page \pageref{sec:appendix}ff).\\
 		\vspace*{.5em}
-		\small \textbf{Note:} To support the future development of the proposed method, the supplementary GNU Octave code\autocite{progcode} and the \LaTeX{} code\autocite{texcode} of this presentation is made available publicly under open licenses.
+		\textbf{Note:} To support the future development of the proposed method, the supplementary GNU Octave code\autocite{progcode} and the \LaTeX{} code\autocite{texcode} of this presentation is made available publicly under open licenses.
 	\end{frame}
 	%
 	%-------------------------------------------------------------------------------------------------------------------
 	\section*{References}
-	\begin{frame}[noframenumbering]
+	\begin{frame}[noframenumbering,shrink=13]
 		\frametitle{References}
 		\printbibliography
 	\end{frame}
 	%
 	%===================================================================================================================
 	\appendix
-	\section{\appendixname}
+	\section{\appendixname}\label{sec:appendix}
 	%
 	\begin{frame}
-		\frametitle{\appendixname{} \textendash{} xxx}
-		xxx
+		\frametitle{\appendixname{} \textendash{} Application remarks, part I}
+%		Für die sinnvolle Anwendung der Methode auf Ultraschall-Signale (Kompressions- und Schwerwellen, Ultraschall-Puls Transmissionsverfahren) sind hinsichtlich der Wahl der Parameter der Methode folgende Aspekte zu berücksichtigen:
+		For the sensible application of the method to ultrasonic signals (compression and shear waves, ultrasonic pulse transmission method), the following aspects need to be considered in the choice of the detection method's parameters:
+		\begin{itemize}
+%			\item Maximum- und Minimum-Detektion: Die Detektionsmethode wurde hier hinsichtlich der Detektion des ersten lokalen Maximums dargestellt. Sollte die Signalantwort der Schallwelle mit einem ersten lokalen Minimum beginnen ist es ausreichend das Vorzeichen der Signalamplituden zu invertieren und dann eine Maximumsdetektion durchzuführen.
+			\item Maximum and minimum detection: The detection method is shown here for the detection of the first local maximum. If the signal response of the sound wave begins with a first local minimum, it is sufficient to invert the sign of the signal amplitudes and then perform a maximum detection.
+			%
+%			\item Counter limit $c_{\lim}$: Dieser Eingangsparameter ist, wie zuvor gezeigt wurde, abhängig von der Wellenlänge und damit von der Signalfrequenz. Ein recht brauchbarer Ansatz ist es, die halbe Wellenlänge der dominanten Signalfrequenz zu wählen. Da der Wertebereich von $c_{\lim}$ für eine erfolgreiche Detektion recht groß ist, reicht eine grobe Abschätzung bereits aus (z.B. DFT basiertes Messsystem).
+			\item Counter limit $c_{\lim}$: As previously shown, this input parameter depends on the wavelength and therefore the signal frequency. A handy approach is to assign half the wavelength of the dominant signal frequency. As the value range of $c_{\lim}$ is quite extensive for successful detection, a rough estimate is already sufficient (e.g. DFT-based measurement system).
+		\end{itemize}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{\appendixname{} \textendash{} Application remarks, part II}
+		\begin{itemize}
+			%			\item Detektionsstartpunkt $n_i$ bei Kompressionswellen (Primärwellen): Dieser Punkt muss jedenfalls vor dem ersten lokalen Extremwert liegen. Der Bereich zwischen diesem Punkt und der Signalantwort der eintreffenden Schallwelle sollte im günstigsten Fall nur Signalrauschen zu finden sein. Beim Ultraschall-Puls Transmissionsverfahren ist direkt nach dem Triggerpunkt häufig eine Interferenz mit der elektromagnetischen Welle der Pulsanregung vorhanden. Als Startpunkt $n_i$ ist daher sinnvollerweise ein Index hinter dem Ende dieser Signalstörung zu wählen. Da diese Störung eher hochfrequenter Natur ist, kann auch der Triggerpunkt in Kombination mit einem ausreichend großen Wert für $c_{\lim}$ gewählt werden.
+			\item Detection start point $n_i$ for compression waves (primary waves): This point must always lie before the first local extreme value. The area between this point and the signal response of the incoming sound wave should, in the best case, only consist of the noise floor. In the ultrasonic pulse transmission method, interference with the electromagnetic wave of the pulse excitation often occurs directly after the trigger point. It therefore makes sense to select an index after the end of this disturbance as the starting point $n_i$. As this interference tends to be of a high-frequency nature, selecting the trigger point in combination with a sufficiently large value for $c_{\lim}$ can be sufficient to avoid false detections. Preliminary results of the compression wave signal analysis using the here presented method are available online\cite{prelimresultspaper2}.
+		\end{itemize}
+	\end{frame}
+	%
+	\begin{frame}
+		\frametitle{\appendixname{} \textendash{} Application remarks, part III}
+		\begin{itemize}
+			%			\item Detektionsstartpunkt $n_i$ bei Scherwellen (Sekundärwellen): Dieser Punkt muss ebenfalls vor dem ersten lokalen Extremwert liegen. Bei visko-elastischen und elastischen Proben folgt die Signalantwort der Scherwelle zeitlich immer der Signalantwort der Kompressionswelle. Beobachtungen zeigen, dass die Signalantwort der Scherwelle auch immer eine Signalantwort der Kompressionswelle beinhaltet. Dadurch finden sich im Bereich vor der eintreffenden Scherwelle potenziell Artefakte der Kompressionswelle (Ausschwingvorgang, Reflexionen). Daher ist es in diesem Fall erforderlich den Detektionsstartpunkt $n_i$ so knapp wie möglich vor die eintreffende Signalantwort der Scherwelle zu legen um Falsch-Detektionen zu vermeiden. Zusätzlich hilfreich ist es $c_{\lim}$ so groß wie möglich zu wählen (knapp unter der Wellenlänge der Scherwelle), da die Kompressionswelle auch immer eine kleinere Frequenz als die Scherwelle aufweist. Vorläufige Ergebnisse der Signalanalyse von Kompressions- und Scherwellen bei denen die hier präsentierte Methode verwendet wurde sind online verfügbar\cite{prelimresultsps}.
+			\item Detection starting point $n_i$ for shear waves (secondary waves): This point must also lie before the first local extreme value. For visco-elastic and elastic specimen, the signal response of the shear wave always follows the signal response of the compression wave in time. Observations show that the signal response of the shear wave always includes a signal response of the compression wave. As a result, artefacts of the compression wave (fading-out, reflections) can be found in the closer area before the signal response of the incoming shear wave. In this case, it is thus necessary to set the detection start point $n_i$ as close as possible to the incoming signal response of the shear wave in order to avoid false detections. It is also helpful to select $c_{\lim}$ as large as possible (just below the wavelength of the shear wave), as the compression wave always has a lower frequency than the shear wave. Preliminary results of the compression- and shear wave signal analysis using the here presented method are available online\cite{prelimresultspaper3}.
+		\end{itemize}
 	\end{frame}
 	%
 	\begin{frame}[noframenumbering]
