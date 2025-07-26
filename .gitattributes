@@ -1,1 +1,2 @@
 octave/results/test_peakholdmax/noise_Nsmp30000_Nmc100.oct filter=lfs diff=lfs merge=lfs -text
+octave/results/test_peakholdmax/noise_Nsmp8000_Nmc500.oct filter=lfs diff=lfs merge=lfs -text
