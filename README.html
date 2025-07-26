@@ -1,0 +1,204 @@
+<h1>Local extreme value detection for sinusoidal signals corrupted by noise</h1>
+
+<p><strong>A numerical study on (damped) sinusoidal signals</strong></p>
+
+<h2>Abstract</h2>
+
+<p>The analysis of ultrasonic signals is characterised by the analysis of signal data in time domain. In the ultrasonic pulse transmission method, the signal analysis is often aimed at detecting the onset point of the incoming compression or shear wave. This makes it possible to determine the sound propagation time and, if the measuring distance is known, the speed of sound as an essential material parameter.</p>
+
+<p>This starting point is not always easy to localise due to signal noise and possible interference. As an aid and to stabilise the signal analysis, it is useful to estimate the location of the first local extreme value (minimum or maximum) directly behind the onset point of the compression or shear wave. This can significantly reduce the search interval for the onset point and increase the robustness of the entire subsequent analysis.</p>
+
+<p>Experience shows that the first local minimum or maximum is not always identical to the global minimum or maximum. This circumstance very easily leads to false detection. In this work, a search method is presented that enables the robust detection of the first local extreme value's location and comes with a moderate computational effort.</p>
+
+<blockquote>
+  <p>[!NOTE]
+The entire content of this repository was conceived, implemented and tested by Jakob Harden using the scientific numerical programming language of GNU Octave 6.2.0 and TeXlive/TeXStudio.</p>
+</blockquote>
+
+<h2>Table of contents</h2>
+
+<ul>
+<li><a href="#licence">Licence</a></li>
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#directory-and-file-structure">Directory and file structure</a></li>
+<li><a href="#installation-instructions">Installation instructions</a></li>
+<li><a href="#usage-instructions">Usage instructions</a></li>
+<li><a href="#help-and-documentation">Help and Documentation</a></li>
+<li><a href="#related-data-sources">Related data sources</a></li>
+<li><a href="#related-software">Related software</a></li>
+<li><a href="#revision-and-release-history">Revision and release history</a></li>
+</ul>
+
+<h2>Licence</h2>
+
+<p>Copyright 2025 Jakob Harden (jakob.harden@tugraz.at, Graz University of Technology, Graz, Austria)</p>
+
+<p>This file is part of the PhD thesis of Jakob Harden.</p>
+
+<p>All GNU Octave function files (*.m) are licensed under the <em>GNU Affero General Public Licence v3.0</em>. See also licence information file "LICENSE".</p>
+
+<p>All *.pdf, *.png and *.mat files in the directory <strong>./octave/scicol_crameri</strong> are licensed under the MIT licence. See also <strong>./octave/scicol_crameri/README.md</strong>. </p>
+
+<p>All other files are licensed under the <em>Creative Commons Attribution 4.0 International</em> licence. See also licence information: <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Licence deed</a></p>
+
+<h2>Prerequisites</h2>
+
+<p>To be able to use the scripts, GNU Octave 6.2.0 (or a higher version) need to to be installed.
+GNU Octave is available via the package management system on many Linux distributions. Windows users have to download the Windows version of GNU Octave and to install the software manually.</p>
+
+<p><a href="https://octave.org/download">GNU Octave download</a></p>
+
+<p>To compile the LaTeX documents in this repository a TeXlive installation is required. The TeXlive package is available via the package management system on many Linux distributions. Windows users have to download the Windows version of TeXlive and to install the software manually.</p>
+
+<p><a href="https://www.tug.org/texlive/windows.html">TeXlive download</a></p>
+
+<blockquote>
+  <p>[!TIP]
+<strong>TeXStudio</strong> is a convinient and powerful solution to edit TeX files!</p>
+</blockquote>
+
+<h2>Directory and file structure</h2>
+
+<p>GNU Octave script files (*.m) are written in the scientific programming language of GNU Octave 6.2.0. LaTeX files (*.tex) are written with compliance to TeXlive version 2020.20210202-3. Text files are generally encoded in UTF-8.</p>
+
+<p><code>
+peakholdmax <br />
+├── latex <br />
+│   ├── adaptthemePresRIP.tex <br />
+│   ├── biblio.bib <br />
+│   └── main.tex <br />
+├── octave <br />
+│   ├── results <br />
+│   │   └── test_peakholdmax <br />
+│   │       ├── fig <br />
+│   │       ├── oct <br />
+│   │       ├── png <br />
+│   │       └── noise_Nsmp8000_Nmc500.oct <br />
+│   ├── scicol_crameri <br />
+│   │   ├── README.md <br />
+│   │   ├── colormap_crameri.m <br />
+│   │   ├── *.mat <br />
+│   │   ├── *.pdf <br />
+│   │   └── *.png <br />
+│   ├── tools <br />
+│   │   ├── tool_det_localmax.m <br />
+│   │   ├── tool_gen_noise.m <br />
+│   │   ├── tool_gen_signal.m <br />
+│   │   └── tool_scale_noise2snr.m <br />
+│   ├── init.m <br />
+│   └── test_peakholdmax.m <br />
+├── published <br />
+├── LICENSE <br />
+├── README.html <br />
+└── README.md
+</code></p>
+
+<ul>
+<li><strong>peakholdmax</strong> ... main program directory
+<ul>
+<li><em>LICENSE</em> ... AGPLv3 licence information file</li>
+<li><em>README.md</em> ... this file, information about the program (CC BY-4.0)</li>
+<li><em>README.html</em> ... html version of this file (CC BY-4.0)</li>
+</ul></li>
+<li><strong>peakholdmax/latex</strong> ... directory, LaTeX documents, presentation slides (CC BY-4.0)
+<ul>
+<li><em>adaptthemePresRIP.tex</em> ... file, LaTeX beamer class configuration</li>
+<li><em>biblio.bib</em> ... file, bibtex bibliography</li>
+<li><em>main.tex</em> ... file, main LaTeX document, presentation source code</li>
+</ul></li>
+<li><strong>peakholdmax/octave</strong> ... directory, GNU Octave script files and analysis results (AGPLv3)
+<ul>
+<li><em>init.m</em> ... function file, initialization script, load additional packages, add subdirectories to path environment variable</li>
+<li><em>test_peakholdmax.m</em> ... GNU Octave function file, main script, algorithm test</li>
+</ul></li>
+<li><strong>peakholdmax/octave/results/test_peakholdmax</strong> ... directory, analysis results (CC BY-4.0)
+<ul>
+<li><em>noise_Nsmp8000_Nmc500.oct</em> ... GNU Octave binary file, standard noise data matrix (to reproduce analysis results), see also function file <em>tool_gen_noise.m</em></li>
+<li><strong>/oct</strong> ... directory, GNU Octave binary files, analysis results</li>
+<li><strong>/fig</strong> ... directory, GNU Octave binary files, figures</li>
+<li><strong>/png</strong> ... directory, portable network graphics, figures</li>
+</ul></li>
+<li><strong>peakholdmax/octave/scicol_crameri</strong> ... scientific colour schemes, (AGPLv3, CC BY-4.0, MIT)
+<ul>
+<li><em>README.md</em> ... information about the scientific colour schemes by Fabio Crameri et. al. and additional licence information. (CC BY-4.0)</li>
+<li><em>colormap_crameri.m</em> ... GNU Octave function file, colour map loader (AGPLv3)</li>
+<li><em>*.mat</em> ... MatLAB binary files, colour definitions (MIT)</li>
+<li><em>*.png</em> ... colour scheme documentation (MIT)</li>
+<li><em>*.pdf</em> ... colour scheme documentation (MIT)</li>
+</ul></li>
+<li><strong>peakholdmax/octave/tools</strong> ... directory, GNU Octave tool scripts (AGPLv3)
+<ul>
+<li><em>tool_det_localmax.m</em> ... GNU Octave function file, detect the first local maximum of a low-pass signal corrupted by noise</li>
+<li><em>tool_gen_noise.m</em> ... GNU Octave function file, generate standard noise data for reproducible analysis results</li>
+<li><em>tool_gen_signal.m</em> ... GNU Octave function file, generate (damped) sinusoidal signal</li>
+<li><em>tool_scale_noise2snr.m</em> ... GNU Octave function file, scale noise data w.r.t. signal power and signal-to-noise ratio</li>
+</ul></li>
+<li><strong>peakholdmax/published</strong> ... directory, published documents, archives (AGPLv3, CC BY-4.0)</li>
+</ul>
+
+<h2>Installation instructions</h2>
+
+<ol>
+<li>Copy the program directory <strong>peakholdmax</strong> to a location of your choice. e.g. <strong>/home/acme/science/peakholdmax</strong>.   </li>
+<li>Open GNU Octave.   </li>
+<li>Make the program directory <strong>/home/acme/science/peakholdmax</strong> the working directory.   </li>
+</ol>
+
+<h2>Usage instructions</h2>
+
+<ol>
+<li>Open GNU Octave.   </li>
+<li>Initialize program.   </li>
+<li>Run script files.   </li>
+</ol>
+
+<h3>Initialize program (command line interface)</h3>
+
+<p>The <em>init</em> command initializes the program. The initialization must be run once before executing all the other functions. The command is adding the subdirectories included in the main program directory to the 'path' environment variable. Furthermore, <em>init</em> is loading additional GNU Octave packages required for the program execution.</p>
+
+<p><code>
+    octave: &gt;&gt; init;
+</code></p>
+
+<h3>Execute function file (command line interface)</h3>
+
+<p><code>
+    octave: &gt;&gt; test_peakholdmax('compile'); # compile test signals and the paramater variation (Monte-Carlo simulation) <br />
+    octave: &gt;&gt; test_peakholdmax('plot'); # plot test signals and the paramater variation results
+</code></p>
+
+<blockquote>
+  <p>[!NOTE]
+To reproduce all analysis results shown in the presentation in <strong>peakholdmax/latex</strong>, run all above-mentioned commands.</p>
+</blockquote>
+
+<h2>Help and Documentation</h2>
+
+<p>All function files contain an adequate function description and instructions on how to use the functions. The documentation can be displayed in the GNU Octave command line interface by entering the following command:</p>
+
+<p><code>
+    octave: &gt;&gt; help function_file_name;
+</code></p>
+
+<h2>Related work</h2>
+
+<p>The local extreme value detection method presented here is used in other publications of the author of this work. More information about this publications and preliminary results are available online.</p>
+
+<ul>
+<li>Harden, J. (2025) "Ultrasonic Pulse Transmission Method: Enhanced threshold detection method enabling fast and robust primary wave time range estimation - Website". <a href="https://jakobharden.at/wordpress/planned-publication-paper-2/">Website</a>   </li>
+<li>Harden, J. (2025) "Ultrasonic Pulse Transmission Method: A robust method to detect the onset point of shear waves using cross-correlation analysis - Website". <a href="https://jakobharden.at/wordpress/planned-publication-paper-3/">Website</a>   </li>
+<li>Harden, J. (2025) "Ultrasonic pulse transmission method: Fully automated primary wave onset point detection - preliminary results". <a href="https://doi.org/10.3217/z5dcs-hf845">DOI: 10.3217/z5dcs-hf845</a>   </li>
+<li>Harden, J. (2025) "Ultrasonic Pulse Transmission Method: A robust method to detect the onset point of shear waves using cross-correlation analysis - preliminary results". <a href="https://doi.org/10.13140/RG.2.2.29301.90084">DOI: 10.13140/RG.2.2.29301.90084</a>   </li>
+</ul>
+
+<h2>Revision and release history</h2>
+
+<h3>2025-07-26, version 1.0.0</h3>
+
+<ul>
+<li>published/released version 1.0.0, by Jakob Harden   </li>
+<li>URL: <a href="https://repository.tugraz.at/">Repository of Graz University of Technology</a>   </li>
+<li>Presentation, DOI: <a href="https://doi.org/xxxx">xxxx</a>   </li>
+<li>GNU Octave code, DOI: <a href="https://doi.org/xxxx">xxxx</a>   </li>
+<li>LaTeX code, DOI: <a href="https://doi.org/xxxx">xxxx</a>   </li>
+</ul>
